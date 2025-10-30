@@ -23,10 +23,10 @@
   <h1>Centro de Ayuda — Uruguay</h1>
   <p>Seleccioná el contacto que querés usar:</p>
 
-  <!-- WhatsApp: No estás sola -->
+  <!-- WhatsApp: solo mensaje y ubicación -->
   <p>
-    <a class="btn wa" href="#" onclick="sendWhatsApp('59899019500','Necesito%20ayuda.%20Mi%20ubicaci%C3%B3n%20es:')">
-      📩 099 019 500 — No estás sola (WhatsApp)
+    <a class="btn wa" href="#" onclick="sendWhatsApp('59899019500')">
+      📩 WhatsApp — Enviar mensaje de ayuda con ubicación
     </a>
   </p>
 
@@ -45,34 +45,29 @@
     <a class="btn call" href="tel:911">🚨 911 — Emergencia inmediata</a>
   </p>
 
-  <p class="note">Si das permiso al navegador, el botón de WhatsApp incluirá tu ubicación automáticamente. Si no, enviará este enlace de la página.</p>
+  <p class="note">Si das permiso al navegador, el botón de WhatsApp incluirá tu ubicación automáticamente.</p>
   <p class="danger">Si estás en peligro inmediato: llamá al <strong>911</strong> ahora.</p>
 
 <script>
-function sendWhatsApp(number, baseMessage){
+function sendWhatsApp(number){
+  const baseMessage = "Necesito ayuda. Mi ubicación es: ";
+  
   if(!navigator.geolocation){
-    const fallback = encodeURIComponent(location.href);
-    window.location.href = 'https://wa.me/' + number + '?text=' + encodeURIComponent(baseMessage + fallback);
+    // fallback si no hay geolocalización
+    window.location.href = 'https://wa.me/' + number + '?text=' + encodeURIComponent(baseMessage);
     return;
   }
 
-  const geoTimeout = setTimeout(function(){
-    const fallback = encodeURIComponent(location.href);
-    window.location.href = 'https://wa.me/' + number + '?text=' + encodeURIComponent(baseMessage + fallback);
-  },8000);
-
   navigator.geolocation.getCurrentPosition(function(pos){
-    clearTimeout(geoTimeout);
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
     const maps = 'https://www.google.com/maps?q=' + lat + ',' + lon;
-    const msg = baseMessage + ' ' + maps + ' (si no funciona, accede a: ' + location.href + ')';
+    const msg = baseMessage + maps;
     const encoded = encodeURIComponent(msg);
     window.location.href = 'https://wa.me/' + number + '?text=' + encoded;
   }, function(err){
-    clearTimeout(geoTimeout);
-    const fallback = encodeURIComponent(location.href);
-    window.location.href = 'https://wa.me/' + number + '?text=' + encodeURIComponent(baseMessage + fallback);
+    // fallback si deniega ubicación
+    window.location.href = 'https://wa.me/' + number + '?text=' + encodeURIComponent(baseMessage);
   }, {enableHighAccuracy:true, timeout:7000});
 }
 </script>
